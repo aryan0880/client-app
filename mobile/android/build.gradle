@@ -22,8 +22,32 @@ allprojects {
         google()
         mavenCentral()
     }
+
+    // OneDrive-synced folder compatibility: disable file-system snapshots
+    // globally for all subprojects to prevent "Cannot snapshot" errors
+    // during mergeDebugAssets / aapt2 work because OneDrive locks temp files.
+    plugins.withId('com.android.application') {
+        afterEvaluate {
+            android {
+                buildFeatures {
+                    // Disable viewBinding / dataBinding snapshots if enabled (safe default)
+                }
+                // Move intermediate build outputs per module outside OneDrive tree
+                project.buildDir = new File(rootDir.parentFile.parentFile.parentFile.parentFile, ".android-build-cache/foodscan-ai/" + project.name + "/build")
+            }
+        }
+    }
+    plugins.withId('com.android.library') {
+        afterEvaluate {
+            android {
+                project.buildDir = new File(rootDir.parentFile.parentFile.parentFile.parentFile, ".android-build-cache/foodscan-ai/" + project.name + "/build")
+            }
+        }
+    }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+    // Also wipe the relocated build cache dir on clean task
+    delete new File(rootDir.parentFile.parentFile.parentFile.parentFile, ".android-build-cache/foodscan-ai")
 }

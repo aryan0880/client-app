@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { Scan, ShieldCheck, Zap, Sparkles, ArrowRight } from 'lucide-react';
+import { Scan, ShieldCheck, Zap, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 
 export const SplashScreen: React.FC = () => {
-  const { setScreen } = useAppStore();
+  const { setScreen, isHydrated, token } = useAppStore();
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    if (token) {
+      setScreen('DASHBOARD');
+    }
+  }, [isHydrated, token, setScreen]);
+
+  const showButtons = isHydrated && !token;
 
   return (
     <div className="min-h-screen flex flex-col justify-between p-6 bg-gradient-to-b from-slate-950 via-slate-900 to-emerald-950/40 text-center relative overflow-hidden">
@@ -39,23 +48,32 @@ export const SplashScreen: React.FC = () => {
             <Zap size={14} /> Gemini 1.5/2.0
           </span>
         </div>
+
+        {!isHydrated && (
+          <div className="flex items-center gap-2 text-slate-400 text-xs mt-4">
+            <Loader2 size={14} className="animate-spin" />
+            <span>Restoring your session…</span>
+          </div>
+        )}
       </div>
 
-      <div className="w-full space-y-3 z-10">
-        <button
-          onClick={() => setScreen('ONBOARDING')}
-          className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 font-bold text-base shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-[0.98] transition flex items-center justify-center gap-2"
-        >
-          Get Started <ArrowRight size={18} />
-        </button>
+      {showButtons && (
+        <div className="w-full space-y-3 z-10">
+          <button
+            onClick={() => setScreen('ONBOARDING')}
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 font-bold text-base shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-[0.98] transition flex items-center justify-center gap-2"
+          >
+            Get Started <ArrowRight size={18} />
+          </button>
 
-        <button
-          onClick={() => setScreen('AUTH')}
-          className="w-full py-3 rounded-2xl bg-slate-900/80 border border-slate-800 text-slate-300 font-semibold text-sm hover:bg-slate-800 transition"
-        >
-          I Already Have an Account
-        </button>
-      </div>
+          <button
+            onClick={() => setScreen('AUTH')}
+            className="w-full py-3 rounded-2xl bg-slate-900/80 border border-slate-800 text-slate-300 font-semibold text-sm hover:bg-slate-800 transition"
+          >
+            I Already Have an Account
+          </button>
+        </div>
+      )}
     </div>
   );
 };

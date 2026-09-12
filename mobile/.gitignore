@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Vite build output
+dist/
+dist-ssr/
+build/
+
+# Local env
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
+
+# --- Android (Gradle / Capacitor generated) ---
+android/.gradle/
+android/build/
+android/app/build/
+android/app/release/
+android/app/*.apk
+android/app/*.aab
+android/captures/
+android/.idea/
+
+# Local SDK path (specific to one machine)
+android/local.properties
+
+# Keystores & signing secrets (NEVER COMMIT)
+android/app/*.keystore
+android/app/*.jks
+android/app/signing.properties
+
+# Capacitor copied web assets
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+android/app/src/main/res/xml/config.xml
+android/capacitor-cordova-android-plugins/

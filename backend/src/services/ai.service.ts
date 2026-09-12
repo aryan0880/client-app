@@ -1,7 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const apiKey = process.env.GEMINI_API_KEY || '';
-const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+const getGenAI = () => {
+  const key = process.env.GEMINI_API_KEY || '';
+  return key ? new GoogleGenerativeAI(key) : null;
+};
 
 export interface PackagedAnalysisResult {
   productName: string;
@@ -72,6 +74,7 @@ export const analyzePackagedFoodImage = async (
   imageBase64: string,
   mimeType: string = 'image/jpeg'
 ): Promise<PackagedAnalysisResult> => {
+  const genAI = getGenAI();
   if (genAI) {
     try {
       const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
@@ -87,7 +90,7 @@ export const analyzePackagedFoodImage = async (
   "summary": "Plain English summary of nutritional profile",
   "rawOcrText": "Extracted text string"
 }`;
-      const imagePart = { inlineData: { data: imageBase64, mimeType } };
+      const imagePart = { inlineData: { data: imageBase64.replace(/^data:image\/\w+;base64,/, ''), mimeType } };
       const result = await model.generateContent([prompt, imagePart]);
       const response = await result.response;
       const text = response.text() || '';
@@ -136,6 +139,7 @@ export const analyzeMealImage = async (
   imageBase64: string,
   mimeType: string = 'image/jpeg'
 ): Promise<MealAnalysisResult> => {
+  const genAI = getGenAI();
   if (genAI) {
     try {
       const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
@@ -149,7 +153,7 @@ export const analyzeMealImage = async (
   "likelyIngredients": ["ingredient 1", "ingredient 2"],
   "healthSummary": "High protein balanced meal with moderate carbs."
 }`;
-      const imagePart = { inlineData: { data: imageBase64, mimeType } };
+      const imagePart = { inlineData: { data: imageBase64.replace(/^data:image\/\w+;base64,/, ''), mimeType } };
       const result = await model.generateContent([prompt, imagePart]);
       const response = await result.response;
       const text = response.text() || '';
@@ -188,6 +192,7 @@ export const analyzeVisualQualityImage = async (
   imageBase64: string,
   mimeType: string = 'image/jpeg'
 ): Promise<QualityAnalysisResult> => {
+  const genAI = getGenAI();
   if (genAI) {
     try {
       const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
@@ -201,7 +206,7 @@ Return STRICT JSON:
   "safetyDisclaimer": "Standard disclaimer text",
   "assessmentNotes": "Observation notes"
 }`;
-      const imagePart = { inlineData: { data: imageBase64, mimeType } };
+      const imagePart = { inlineData: { data: imageBase64.replace(/^data:image\/\w+;base64,/, ''), mimeType } };
       const result = await model.generateContent([prompt, imagePart]);
       const response = await result.response;
       const text = response.text() || '';
@@ -221,6 +226,7 @@ Return STRICT JSON:
       console.warn('Gemini visual quality call failed, using fallback:', err);
     }
   }
+
 
   return {
     status: 'NO_OBVIOUS_ISSUES',

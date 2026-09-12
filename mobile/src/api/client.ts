@@ -4,9 +4,14 @@ const getApiBaseUrl = (): string => {
   const envUrl = (import.meta as any).env?.VITE_API_URL;
   if (envUrl) return envUrl;
 
-  if (typeof window !== 'undefined' && window.location?.hostname) {
-    const host = window.location.hostname;
-    if (host !== 'localhost' && host !== '127.0.0.1') {
+  if (typeof window !== 'undefined') {
+    const host = window.location?.hostname || '';
+    const isNativeCapacitor = (window as any).Capacitor?.isNativePlatform() || host === 'localhost' || host === '127.0.0.1' || host === 'capacitor';
+    if (isNativeCapacitor) {
+      // In Android emulator, 10.0.2.2 resolves to host PC localhost
+      return 'http://10.0.2.2:5001/api';
+    }
+    if (host) {
       return `http://${host}:5001/api`;
     }
   }
