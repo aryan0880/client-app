@@ -3,7 +3,10 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-RUN apk add --no-cache python3 make g++
+RUN apk add --no-cache python3 make g++ openssl
+
+ENV PRISMA_QUERY_ENGINE_LIBRARY=linux-musl-openssl-3.0.x
+ENV PRISMA_ENGINES_MIRROR=https://binaries.prisma.sh
 
 COPY package*.json ./
 RUN npm ci --include=dev
@@ -22,7 +25,10 @@ FROM node:20-alpine AS runner
 ENV NODE_ENV=production
 WORKDIR /app
 
-RUN apk add --no-cache dumb-init tini
+RUN apk add --no-cache dumb-init tini openssl ca-certificates
+
+ENV PRISMA_QUERY_ENGINE_LIBRARY=linux-musl-openssl-3.0.x
+ENV PRISMA_ENGINES_MIRROR=https://binaries.prisma.sh
 
 COPY package*.json ./
 RUN npm ci --omit=dev
